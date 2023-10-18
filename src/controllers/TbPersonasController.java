@@ -7,12 +7,16 @@ import java.net.URL;
 import java.util.ResourceBundle;
 
 import application.Main;
+
 import dao.PersonasDao;
+
 import javafx.beans.property.SimpleStringProperty;
+
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
+
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -20,12 +24,16 @@ import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
+
 import javafx.stage.Stage;
 
 import model.Persona;
@@ -75,6 +83,21 @@ public class TbPersonasController implements Initializable {
 		if (tbViewPersonas.getSelectionModel().getSelectedItem() != null) {
 			personaIndex = tbViewPersonas.getSelectionModel().getSelectedIndex();
 		}
+		/* Si se hace un click derecho sobre una persona se harirá un 
+		 *   contextMenu para poder modificar o eliminar personas */
+		MouseButton button = event.getButton();
+		if (button == MouseButton.SECONDARY && tbViewPersonas.getSelectionModel().getSelectedItem() != null) {
+			personaIndex = tbViewPersonas.getSelectionModel().getSelectedIndex();
+			ContextMenu cnMenuPersona = new ContextMenu();
+			MenuItem miModificar = new MenuItem("Modificar");
+			MenuItem miEliminar = new MenuItem("Eliminar");
+			cnMenuPersona.getItems().addAll(miModificar,miEliminar);
+			tbViewPersonas.setContextMenu(cnMenuPersona);
+			
+			/* Añadimos las acciones correspondientes a los Items de Menu */
+			miModificar.setOnAction(e -> modificarPersona(e));
+			miEliminar.setOnAction(e -> eliminarPersona(e));
+		}
 	}
 	
 	/* Añade una persona a la tabla y BDD */
@@ -89,7 +112,9 @@ public class TbPersonasController implements Initializable {
 			newPersonaWindow.setParent(this, null);
 
 			Stage agregarStage = new Stage();
-			agregarStage.setScene(new Scene(root));
+			Scene scene = new Scene(root);
+			scene.getStylesheets().add(getClass().getResource("/css/application.css").toExternalForm());
+			agregarStage.setScene(scene);
 			agregarStage.setResizable(false);
 			agregarStage.getIcons().add(ICONO);
 			agregarStage.setTitle("Nueva Persona");
@@ -112,7 +137,9 @@ public class TbPersonasController implements Initializable {
 				newPersonaWindow.setParent(this, tbViewPersonas.getItems().get(personaIndex));
 
 				Stage agregarStage = new Stage();
-				agregarStage.setScene(new Scene(root));
+				Scene scene = new Scene(root);
+				scene.getStylesheets().add(getClass().getResource("/css/application.css").toExternalForm());
+				agregarStage.setScene(scene);
 				agregarStage.getIcons().add(ICONO);
 				agregarStage.setTitle("Modificar Persona");
 				agregarStage.showAndWait();
